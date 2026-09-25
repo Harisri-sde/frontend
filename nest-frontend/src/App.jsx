@@ -1,122 +1,231 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+} from "react-router-dom";
 
-function App() {
-  const [count, setCount] = useState(0)
+import { AuthProvider } from "./context/AuthContext";
 
+import ProtectedRoute from "./components/ProtectedRoute";
+
+import Login from "./pages/Login";
+import Profile from "./pages/Profile";
+
+// Worker
+import WorkerDashboard from "./pages/worker/WorkerDashboard";
+import WorkerAttendance from "./pages/worker/WorkerAttendance";
+import WorkerUpdates from "./pages/worker/WorkerUpdates";
+
+// Manager
+import ManagerDashboard from "./pages/manager/ManagerDashboard";
+import ManagerAttendance from "./pages/manager/ManagerAttendance";
+import TeamAttendance from "./pages/manager/TeamAttendance";
+import ManagerUpdates from "./pages/manager/ManagerUpdates";
+
+// HR
+import HRDashboard from "./pages/hr/HRDashboard";
+import HRAttendance from "./pages/hr/HRAttendance";
+import EmployeeManagement from "./pages/hr/EmployeeManagement";
+import AllAttendance from "./pages/hr/AllAttendance";
+import HRUpdates from "./pages/hr/HRUpdates";
+
+function Unauthorized() {
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="center-page">
+      <h1>
+        Access Denied
+      </h1>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      <p>
+        You don't have permission to access this page.
+      </p>
+    </div>
+  );
 }
 
-export default App
+export default function App() {
+  return (
+    <BrowserRouter>
+
+      <AuthProvider>
+
+        <Routes>
+
+          {/* =========================================
+              PUBLIC
+          ========================================= */}
+
+          <Route
+            path="/login"
+            element={<Login />}
+          />
+
+          <Route
+            path="/unauthorized"
+            element={<Unauthorized />}
+          />
+
+
+          {/* =========================================
+              SHARED AUTHENTICATED ROUTES
+          ========================================= */}
+
+          <Route
+            element={
+              <ProtectedRoute
+                allowedRoles={[
+                  "worker",
+                  "manager",
+                  "hr_admin",
+                ]}
+              />
+            }
+          >
+
+            <Route
+              path="/profile"
+              element={<Profile />}
+            />
+
+          </Route>
+
+
+          {/* =========================================
+              WORKER
+          ========================================= */}
+
+          <Route
+            element={
+              <ProtectedRoute
+                allowedRoles={["worker"]}
+              />
+            }
+          >
+
+            <Route
+              path="/worker"
+              element={<WorkerDashboard />}
+            />
+
+            <Route
+              path="/worker/attendance"
+              element={<WorkerAttendance />}
+            />
+
+            <Route
+              path="/worker/updates"
+              element={<WorkerUpdates />}
+            />
+
+          </Route>
+
+
+          {/* =========================================
+              MANAGER
+          ========================================= */}
+
+          <Route
+            element={
+              <ProtectedRoute
+                allowedRoles={["manager"]}
+              />
+            }
+          >
+
+            <Route
+              path="/manager"
+              element={<ManagerDashboard />}
+            />
+
+            <Route
+              path="/manager/attendance"
+              element={<ManagerAttendance />}
+            />
+
+            <Route
+              path="/manager/team-attendance"
+              element={<TeamAttendance />}
+            />
+
+            <Route
+              path="/manager/updates"
+              element={<ManagerUpdates />}
+            />
+
+          </Route>
+
+
+          {/* =========================================
+              HR / ADMIN
+          ========================================= */}
+
+          <Route
+            element={
+              <ProtectedRoute
+                allowedRoles={["hr_admin"]}
+              />
+            }
+          >
+
+            <Route
+              path="/hr"
+              element={<HRDashboard />}
+            />
+
+            <Route
+              path="/hr/attendance"
+              element={<HRAttendance />}
+            />
+
+            <Route
+              path="/hr/employees"
+              element={
+                <EmployeeManagement />
+              }
+            />
+
+            <Route
+              path="/hr/all-attendance"
+              element={<AllAttendance />}
+            />
+
+            <Route
+              path="/hr/updates"
+              element={<HRUpdates />}
+            />
+
+          </Route>
+
+
+          {/* =========================================
+              DEFAULT
+          ========================================= */}
+
+          <Route
+            path="/"
+            element={
+              <Navigate
+                to="/login"
+                replace
+              />
+            }
+          />
+
+          <Route
+            path="*"
+            element={
+              <Navigate
+                to="/login"
+                replace
+              />
+            }
+          />
+
+        </Routes>
+
+      </AuthProvider>
+
+    </BrowserRouter>
+  );
+}
